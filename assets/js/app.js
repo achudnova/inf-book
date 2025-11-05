@@ -26,17 +26,43 @@ function clearActiveButtons(selector) {
   });
 }
 
+function highlightCodeBlocks(root) {
+  const blocks = root.querySelectorAll('pre code');
+  if (!blocks.length) {
+    return;
+  }
+
+  if (window.hljs?.highlightElement) {
+    blocks.forEach((block) => {
+      window.hljs.highlightElement(block);
+    });
+    return;
+  }
+
+  const highlightScript = document.querySelector(
+    'script[src*="highlight.js"], script[src*="highlight.min.js"]'
+  );
+
+  if (highlightScript) {
+    highlightScript.addEventListener(
+      'load',
+      () => {
+        blocks.forEach((block) => {
+          window.hljs.highlightElement(block);
+        });
+      },
+      { once: true }
+    );
+  }
+}
+
 function setContent(html) {
   elements.content.innerHTML = '';
   const article = document.createElement('article');
   article.innerHTML = html;
   elements.content.appendChild(article);
 
-  if (window.hljs) {
-    article.querySelectorAll('pre code').forEach((block) => {
-      window.hljs.highlightElement(block);
-    });
-  }
+  highlightCodeBlocks(article);
 }
 
 function showEmptyState(message) {
