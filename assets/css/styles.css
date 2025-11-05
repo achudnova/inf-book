@@ -151,6 +151,34 @@ main {
   color: #e4d5ff;
 }
 
+.hljs {
+  color: #f2f2f5;
+  background: transparent;
+}
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-literal,
+.hljs-section {
+  color: #7f5af0;
+  font-weight: 600;
+}
+
+.hljs-string,
+.hljs-title,
+.hljs-name,
+.hljs-type,
+.hljs-attribute,
+.hljs-number {
+  color: #2cb67d;
+}
+
+.hljs-comment,
+.hljs-quote {
+  color: #6b6780;
+  font-style: italic;
+}
+
 .content blockquote {
   border-left: 3px solid var(--accent-color);
   padding-left: 1rem;
