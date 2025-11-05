@@ -85,6 +85,11 @@ main {
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--muted-text-color);
+  transition: opacity 0.2s ease;
+}
+
+.is-loading [data-chapter-heading] {
+  opacity: 0;
 }
 
 .chapter-list {

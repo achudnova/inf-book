@@ -1,5 +1,7 @@
 const STORAGE_KEY = 'inf-book:state';
 
+document.documentElement.classList.add('is-loading');
+
 const state = {
   categories: {},
   currentCategory: null,
@@ -261,6 +263,8 @@ async function bootstrap() {
   } catch (error) {
     console.error(error);
     showEmptyState('Inhalte konnten nicht geladen werden.');
+  } finally {
+    document.documentElement.classList.remove('is-loading');
   }
 }
 
