@@ -103,6 +103,12 @@ main {
   visibility: hidden;
 }
 
+.sidebar-hidden .content {
+  width: min(100%, 1100px);
+  margin: 0 auto;
+  justify-self: center;
+}
+
 .sidebar h2 {
   margin-top: 0;
   font-size: 1.1rem;
