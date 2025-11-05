@@ -11,6 +11,23 @@ const elements = {
   content: document.querySelector('[data-content]'),
 };
 
+if (window.marked) {
+  window.marked.setOptions({
+    langPrefix: 'hljs language-',
+    highlight(code, language) {
+      if (!window.hljs) {
+        return code;
+      }
+
+      if (language && window.hljs.getLanguage(language)) {
+        return window.hljs.highlight(code, { language }).value;
+      }
+
+      return window.hljs.highlightAuto(code).value;
+    },
+  });
+}
+
 function createButton({ text, classes = [], onClick }) {
   const button = document.createElement('button');
   button.type = 'button';
@@ -30,7 +47,18 @@ function setContent(html) {
   elements.content.innerHTML = '';
   const article = document.createElement('article');
   article.innerHTML = html;
+  applySyntaxHighlighting(article);
   elements.content.appendChild(article);
+}
+
+function applySyntaxHighlighting(rootElement) {
+  if (!window.hljs) {
+    return;
+  }
+
+  rootElement.querySelectorAll('pre code').forEach((block) => {
+    window.hljs.highlightElement(block);
+  });
 }
 
 function showEmptyState(message) {
@@ -44,6 +72,9 @@ async function loadMarkdown(path) {
       throw new Error(`Datei konnte nicht geladen werden: ${response.status}`);
     }
     const markdown = await response.text();
+    if (!window.marked?.parse) {
+      throw new Error('Markdown-Renderer konnte nicht initialisiert werden.');
+    }
     return window.marked.parse(markdown);
   } catch (error) {
     console.error(error);
