@@ -14,6 +14,22 @@
   </head>
   <body>
     <header>
+      <div class="top-bar">
+        <h1 class="brand">INF Book</h1>
+        <div class="actions">
+          <button type="button" class="upload-button" data-upload-trigger>
+            📁 Ordner hochladen
+          </button>
+          <input
+            type="file"
+            hidden
+            multiple
+            webkitdirectory
+            data-folder-input
+            aria-label="Markdown-Ordner auswählen"
+          />
+        </div>
+      </div>
       <nav data-category-bar aria-label="Module"></nav>
     </header>
     <main>
@@ -23,12 +39,16 @@
       </aside>
       <section class="content">
         <div class="empty-state" data-content>
-          Inhalte werden geladen …
+          Lade einen Ordner mit Markdown-Dateien hoch oder wähle eine Kategorie.
         </div>
       </section>
     </main>
 
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js" integrity="sha384-p3Sdz8sRP/6IDdnh3ow1XotJ/1tYL2xtVuSEh47iF9jloQ9lXIszFUKVN2P7EOKf" crossorigin="anonymous"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"
+      integrity="sha384-p3Sdz8sRP/6IDdnh3ow1XotJ/1tYL2xtVuSEh47iF9jloQ9lXIszFUKVN2P7EOKf"
+      crossorigin="anonymous"
+    ></script>
     <script src="assets/js/app.js" defer></script>
   </body>
 </html>
