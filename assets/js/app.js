@@ -9,18 +9,13 @@ const elements = {
   chapterList: document.querySelector('[data-chapter-list]'),
   chapterHeading: document.querySelector('[data-chapter-heading]'),
   content: document.querySelector('[data-content]'),
-  uploadTrigger: document.querySelector('[data-upload-trigger]'),
-  folderInput: document.querySelector('[data-folder-input]'),
 };
 
-function createButton({ text, classes = [], onClick, dataset = {} }) {
+function createButton({ text, classes = [], onClick }) {
   const button = document.createElement('button');
   button.type = 'button';
   button.textContent = text;
   button.classList.add(...classes);
-  Object.entries(dataset).forEach(([key, value]) => {
-    button.dataset[key] = value;
-  });
   button.addEventListener('click', onClick);
   return button;
 }
@@ -57,33 +52,13 @@ async function loadMarkdown(path) {
   }
 }
 
-function normalizeManifest(manifest) {
-  const categories = {};
-  Object.entries(manifest).forEach(([category, chapters = []]) => {
-    categories[category] = chapters.map((chapter) => ({
-      id: `${category}-${chapter.file}`,
-      title: chapter.title,
-      file: chapter.file,
-      source: 'remote',
-    }));
-  });
-  return categories;
-}
-
 function renderCategories() {
   elements.categoryBar.innerHTML = '';
-  const categoryNames = Object.keys(state.categories);
-
-  if (!categoryNames.length) {
-    return;
-  }
-
-  categoryNames.forEach((categoryName) => {
+  Object.keys(state.categories).forEach((categoryName) => {
     const button = createButton({
       text: categoryName,
       classes: ['category-button'],
       onClick: () => selectCategory(categoryName, button),
-      dataset: { category: categoryName },
     });
     if (categoryName === state.currentCategory) {
       button.classList.add('active');
@@ -97,24 +72,19 @@ function renderChapters() {
   const chapters = state.categories[state.currentCategory] || [];
   elements.chapterHeading.textContent = state.currentCategory || 'Kapitel';
 
-  if (!state.currentCategory) {
-    showEmptyState('Wähle eine Kategorie oder lade Inhalte hoch.');
-    return;
-  }
-
   if (!chapters.length) {
     showEmptyState('Noch keine Kapitel in dieser Kategorie.');
     return;
   }
 
-  chapters.forEach((chapter) => {
+  chapters.forEach(({ title, file }) => {
     const button = createButton({
-      text: chapter.title,
+      text: title,
       classes: ['chapter-button'],
-      onClick: () => selectChapter(chapter, button),
-      dataset: { file: chapter.file || chapter.title },
+      onClick: () => selectChapter(title, file, button),
     });
-    if (state.currentChapter && state.currentChapter.id === chapter.id) {
+    button.dataset.file = file;
+    if (state.currentChapter && state.currentChapter.file === file) {
       button.classList.add('active');
     }
     elements.chapterList.appendChild(button);
@@ -130,175 +100,50 @@ async function selectCategory(categoryName, button) {
 
   const firstChapter = state.categories[categoryName]?.[0];
   if (firstChapter) {
-    const firstButton = elements.chapterList.querySelector('.chapter-button');
-    firstButton?.click();
+    const firstButton = elements.chapterList.querySelector(
+      `.chapter-button[data-file="${CSS.escape(firstChapter.file)}"]`
+    );
+    if (firstButton) {
+      firstButton.click();
+    }
   } else {
     showEmptyState('Noch keine Kapitel in dieser Kategorie.');
   }
 }
 
-async function loadChapterContent(chapter) {
-  if (chapter.html) {
-    return chapter.html;
-  }
-
-  if (chapter.source === 'local' && chapter.markdown) {
-    chapter.html = window.marked.parse(chapter.markdown);
-    return chapter.html;
-  }
-
-  if (chapter.source === 'remote' && chapter.file) {
-    const html = await loadMarkdown(chapter.file);
-    if (html) {
-      chapter.html = html;
-    }
-    return chapter.html;
-  }
-
-  return null;
-}
-
-async function selectChapter(chapter, button) {
-  state.currentChapter = chapter;
+async function selectChapter(title, file, button) {
+  state.currentChapter = { title, file };
   clearActiveButtons('.chapter-button');
   button?.classList.add('active');
 
-  const html = await loadChapterContent(chapter);
+  const html = await loadMarkdown(file);
   if (html) {
     setContent(html);
   }
 }
 
-function resetNavigation() {
-  renderCategories();
-  renderChapters();
-
-  const firstCategoryButton = elements.categoryBar.querySelector('.category-button');
-  firstCategoryButton?.click();
-}
-
-function formatTitleFromFilename(filename) {
-  return filename
-    .replace(/\.md$/i, '')
-    .split(/[\-_]/)
-    .filter(Boolean)
-    .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
-    .join(' ');
-}
-
-async function handleFolderUpload(event) {
-  const files = Array.from(event.target.files || []).filter((file) =>
-    file.name.toLowerCase().endsWith('.md'),
-  );
-
-  if (!files.length) {
-    showEmptyState('Keine Markdown-Dateien im ausgewählten Ordner gefunden.');
-    return;
-  }
-
-  const categories = {};
-
-  await Promise.all(
-    files.map(async (file) => {
-      const relativePath = file.webkitRelativePath || file.name;
-      const segments = relativePath.split('/').filter(Boolean);
-      if (segments.length < 1) {
-        return;
-      }
-
-      const categoryName = segments[0];
-      const chapterId = relativePath;
-      const title = formatTitleFromFilename(segments[segments.length - 1]);
-      const markdown = await file.text();
-
-      if (!categories[categoryName]) {
-        categories[categoryName] = [];
-      }
-
-      categories[categoryName].push({
-        id: chapterId,
-        title,
-        file: relativePath,
-        source: 'local',
-        markdown,
-      });
-    }),
-  );
-
-  Object.values(categories).forEach((chapters) => {
-    chapters.sort((a, b) => (a.file || a.title).localeCompare(b.file || b.title, 'de'));
-  });
-
-  const mergedCategories = { ...state.categories };
-
-  Object.entries(categories).forEach(([categoryName, newChapters]) => {
-    const existingChapters = mergedCategories[categoryName] ? [...mergedCategories[categoryName]] : [];
-    const chapterMap = new Map(existingChapters.map((chapter) => [chapter.id ?? chapter.file, chapter]));
-
-    newChapters.forEach((chapter) => {
-      chapterMap.set(chapter.id ?? chapter.file, chapter);
-    });
-
-    mergedCategories[categoryName] = Array.from(chapterMap.values()).sort((a, b) => {
-      const keyA = (a.file || a.title || '').toLowerCase();
-      const keyB = (b.file || b.title || '').toLowerCase();
-      return keyA.localeCompare(keyB, 'de');
-    });
-  });
-
-  const sortedCategoryEntries = Object.entries(mergedCategories)
-    .sort(([a], [b]) => a.localeCompare(b, 'de'))
-    .map(([categoryName, chapters]) => [
-      categoryName,
-      [...chapters].sort((a, b) => {
-        const keyA = (a.file || a.title || '').toLowerCase();
-        const keyB = (b.file || b.title || '').toLowerCase();
-        return keyA.localeCompare(keyB, 'de');
-      }),
-    ]);
-
-  state.categories = Object.fromEntries(sortedCategoryEntries);
-
-  if (!state.currentCategory || !state.categories[state.currentCategory]) {
-    state.currentCategory = Object.keys(state.categories)[0] || null;
-  }
-
-  state.currentChapter = null;
-  resetNavigation();
-  elements.folderInput.value = '';
-}
-
-function initializeUploadHandling() {
-  elements.uploadTrigger?.addEventListener('click', () => {
-    elements.folderInput?.click();
-  });
-
-  elements.folderInput?.addEventListener('change', handleFolderUpload);
-}
-
 async function bootstrap() {
-  initializeUploadHandling();
-
-  if (window.location.protocol === 'file:') {
-    showEmptyState('Nutze „Ordner hochladen“, um Inhalte anzuzeigen.');
-    return;
-  }
-
   try {
     const response = await fetch('content/index.json');
     if (!response.ok) {
       throw new Error('Inhaltsverzeichnis konnte nicht geladen werden.');
     }
-    const manifest = await response.json();
-    state.categories = normalizeManifest(manifest);
+    state.categories = await response.json();
     state.currentCategory = Object.keys(state.categories)[0] ?? null;
-    resetNavigation();
+    renderCategories();
+    renderChapters();
+
+    const firstCategoryButton = elements.categoryBar.querySelector('.category-button');
+    if (firstCategoryButton) {
+      firstCategoryButton.click();
+    } else {
+      showEmptyState('Füge Markdown-Dateien hinzu, um zu starten.');
+    }
   } catch (error) {
     console.error(error);
-    showEmptyState(
-      'Inhalte konnten nicht geladen werden. Lade stattdessen einen Ordner hoch.',
-    );
+    showEmptyState('Inhalte konnten nicht geladen werden.');
   }
 }
 
 document.addEventListener('DOMContentLoaded', bootstrap);
+
