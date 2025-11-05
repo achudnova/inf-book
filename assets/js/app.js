@@ -31,6 +31,12 @@ function setContent(html) {
   const article = document.createElement('article');
   article.innerHTML = html;
   elements.content.appendChild(article);
+
+  if (window.hljs) {
+    article.querySelectorAll('pre code').forEach((block) => {
+      window.hljs.highlightElement(block);
+    });
+  }
 }
 
 function showEmptyState(message) {

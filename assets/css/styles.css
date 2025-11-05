@@ -6,6 +6,16 @@
   --text-color: #f2f2f5;
   --muted-text-color: #aaa7bb;
   --border-color: #2a1f3d;
+  --code-bg: #140c22;
+  --code-border: #2d2142;
+  --code-text: #f8f9ff;
+  --code-inline-bg: rgba(127, 90, 240, 0.18);
+  --code-inline-text: #f3eaff;
+  --token-keyword: #c19bff;
+  --token-string: #7fffd4;
+  --token-number: #f2b5ff;
+  --token-comment: #8c7aa6;
+  --token-function: #74d0ff;
   font-family: 'Inter', 'Segoe UI', sans-serif;
 }
 
@@ -139,16 +149,88 @@ main {
 }
 
 .content pre {
-  background: rgba(12, 8, 22, 0.85);
-  padding: 1rem;
-  border-radius: 0.75rem;
+  background: var(--code-bg);
+  padding: 1.25rem 1.5rem;
+  border-radius: 0.85rem;
   overflow-x: auto;
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--code-border);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02),
+    0 25px 50px rgba(12, 8, 22, 0.65);
+  position: relative;
 }
 
-.content code {
+.content pre code {
   font-family: 'Fira Code', 'Cascadia Code', monospace;
-  color: #e4d5ff;
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: var(--code-text);
+  display: block;
+}
+
+.content :not(pre) > code {
+  font-family: 'Fira Code', 'Cascadia Code', monospace;
+  background: var(--code-inline-bg);
+  color: var(--code-inline-text);
+  padding: 0.15rem 0.4rem;
+  border-radius: 0.4rem;
+  border: 1px solid rgba(127, 90, 240, 0.35);
+  font-size: 0.9em;
+}
+
+.content :not(pre) > code::before,
+.content :not(pre) > code::after {
+  content: '\200b';
+}
+
+.hljs {
+  color: var(--code-text);
+  background: transparent;
+}
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-literal,
+.hljs-built_in,
+.hljs-type {
+  color: var(--token-keyword);
+}
+
+.hljs-string,
+.hljs-title.class_,
+.hljs-title.class_.inherited__ {
+  color: var(--token-string);
+}
+
+.hljs-number,
+.hljs-attribute,
+.hljs-template-variable,
+.hljs-variable.constant_ {
+  color: var(--token-number);
+}
+
+.hljs-comment,
+.hljs-quote {
+  color: var(--token-comment);
+  font-style: italic;
+}
+
+.hljs-title,
+.hljs-section,
+.hljs-function .hljs-title {
+  color: var(--token-function);
+}
+
+.hljs-meta,
+.hljs-meta .hljs-string {
+  color: var(--token-number);
+}
+
+.hljs-params {
+  color: rgba(240, 234, 255, 0.85);
+}
+
+.hljs-subst {
+  color: inherit;
 }
 
 .content blockquote {
