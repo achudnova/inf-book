@@ -14,10 +14,23 @@
   </head>
   <body>
     <header>
-      <nav data-category-bar aria-label="Module"></nav>
+      <div class="header-inner">
+        <button
+          type="button"
+          class="sidebar-toggle category-button"
+          data-sidebar-toggle
+          data-show-label="Sidebar anzeigen"
+          data-hide-label="Sidebar ausblenden"
+          aria-controls="sidebar"
+          aria-expanded="true"
+        >
+          Sidebar ausblenden
+        </button>
+        <nav data-category-bar aria-label="Module"></nav>
+      </div>
     </header>
     <main>
-      <aside class="sidebar" aria-label="Kapitelübersicht">
+      <aside id="sidebar" class="sidebar" aria-label="Kapitelübersicht">
         <h2 data-chapter-heading>Kapitel</h2>
         <ul class="chapter-list" data-chapter-list></ul>
       </aside>
