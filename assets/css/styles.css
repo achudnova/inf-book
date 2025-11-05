@@ -160,7 +160,6 @@ main {
 
 .empty-state {
   color: var(--muted-text-color);
-  text-align: center;
   padding: 2rem;
 }
 
