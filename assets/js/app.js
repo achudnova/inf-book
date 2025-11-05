@@ -1,8 +1,34 @@
+const STORAGE_KEY = 'inf-book:state';
+
 const state = {
   categories: {},
   currentCategory: null,
   currentChapter: null,
 };
+
+function loadSavedState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch (error) {
+    console.warn('Gespeicherter Status konnte nicht geladen werden.', error);
+    return null;
+  }
+}
+
+function saveState() {
+  try {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        currentCategory: state.currentCategory,
+        currentChapter: state.currentChapter,
+      })
+    );
+  } catch (error) {
+    console.warn('Status konnte nicht gespeichert werden.', error);
+  }
+}
 
 const elements = {
   categoryBar: document.querySelector('[data-category-bar]'),
@@ -60,6 +86,7 @@ function renderCategories() {
       classes: ['category-button'],
       onClick: () => selectCategory(categoryName, button),
     });
+    button.dataset.category = categoryName;
     if (categoryName === state.currentCategory) {
       button.classList.add('active');
     }
@@ -91,23 +118,57 @@ function renderChapters() {
   });
 }
 
-async function selectCategory(categoryName, button) {
+async function selectCategory(categoryName, button, options = {}) {
+  const { preserveChapter = false } = options;
   state.currentCategory = categoryName;
-  state.currentChapter = null;
+
+  const chapters = state.categories[categoryName] || [];
+
+  if (preserveChapter && state.currentChapter) {
+    const matchingChapter = chapters.find(
+      ({ file }) => file === state.currentChapter.file
+    );
+    state.currentChapter = matchingChapter
+      ? { title: matchingChapter.title, file: matchingChapter.file }
+      : null;
+  } else {
+    state.currentChapter = null;
+  }
+
   clearActiveButtons('.category-button');
-  button?.classList.add('active');
+  const categoryButton =
+    button ??
+    elements.categoryBar.querySelector(
+      `.category-button[data-category="${CSS.escape(categoryName)}"]`
+    );
+  categoryButton?.classList.add('active');
+
   renderChapters();
 
-  const firstChapter = state.categories[categoryName]?.[0];
-  if (firstChapter) {
-    const firstButton = elements.chapterList.querySelector(
-      `.chapter-button[data-file="${CSS.escape(firstChapter.file)}"]`
-    );
-    if (firstButton) {
-      firstButton.click();
-    }
-  } else {
+  if (!chapters.length) {
+    saveState();
+    return;
+  }
+
+  const targetChapter = state.currentChapter || chapters[0] || null;
+
+  if (!targetChapter) {
     showEmptyState('Noch keine Kapitel in dieser Kategorie.');
+    saveState();
+    return;
+  }
+
+  const targetButton = elements.chapterList.querySelector(
+    `.chapter-button[data-file="${CSS.escape(targetChapter.file)}"]`
+  );
+
+  if (targetButton) {
+    if (!state.currentChapter) {
+      state.currentChapter = { title: targetChapter.title, file: targetChapter.file };
+    }
+    targetButton.click();
+  } else {
+    saveState();
   }
 }
 
@@ -120,6 +181,8 @@ async function selectChapter(title, file, button) {
   if (html) {
     setContent(html);
   }
+
+  saveState();
 }
 
 async function bootstrap() {
@@ -129,13 +192,38 @@ async function bootstrap() {
       throw new Error('Inhaltsverzeichnis konnte nicht geladen werden.');
     }
     state.categories = await response.json();
-    state.currentCategory = Object.keys(state.categories)[0] ?? null;
-    renderCategories();
-    renderChapters();
 
-    const firstCategoryButton = elements.categoryBar.querySelector('.category-button');
-    if (firstCategoryButton) {
-      firstCategoryButton.click();
+    const savedState = loadSavedState() ?? {};
+    const availableCategories = Object.keys(state.categories);
+
+    if (
+      savedState.currentCategory &&
+      availableCategories.includes(savedState.currentCategory)
+    ) {
+      state.currentCategory = savedState.currentCategory;
+      const chapters = state.categories[state.currentCategory] || [];
+      const matchingChapter = chapters.find(
+        ({ file }) => savedState.currentChapter?.file === file
+      );
+      if (matchingChapter) {
+        state.currentChapter = {
+          title: matchingChapter.title,
+          file: matchingChapter.file,
+        };
+      } else {
+        state.currentChapter = null;
+      }
+    } else {
+      state.currentCategory = availableCategories[0] ?? null;
+      state.currentChapter = null;
+    }
+
+    renderCategories();
+
+    if (state.currentCategory) {
+      selectCategory(state.currentCategory, null, {
+        preserveChapter: Boolean(state.currentChapter),
+      });
     } else {
       showEmptyState('Füge Markdown-Dateien hinzu, um zu starten.');
     }
