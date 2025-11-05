@@ -108,6 +108,7 @@ function setContent(html, sourcePath = '') {
   article.innerHTML = html;
   resolveMediaSources(article, sourcePath);
   applySyntaxHighlighting(article);
+  applyMathTypesetting(article);
   elements.content.appendChild(article);
 }
 
@@ -195,6 +196,26 @@ function applySyntaxHighlighting(rootElement) {
   rootElement.querySelectorAll('pre code').forEach((block) => {
     window.hljs.highlightElement(block);
   });
+}
+
+function applyMathTypesetting(rootElement) {
+  if (!window.renderMathInElement) {
+    return;
+  }
+
+  try {
+    window.renderMathInElement(rootElement, {
+      delimiters: [
+        { left: '$$', right: '$$', display: true },
+        { left: '\\[', right: '\\]', display: true },
+        { left: '\\(', right: '\\)', display: false },
+        { left: '$', right: '$', display: false },
+      ],
+      throwOnError: false,
+    });
+  } catch (error) {
+    console.warn('Mathematische Formeln konnten nicht gerendert werden.', error);
+  }
 }
 
 function showEmptyState(message) {
