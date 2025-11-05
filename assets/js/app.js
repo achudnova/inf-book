@@ -6,6 +6,7 @@ const state = {
   categories: {},
   currentCategory: null,
   currentChapter: null,
+  isSidebarHidden: false,
 };
 
 function loadSavedState() {
@@ -25,6 +26,7 @@ function saveState() {
       JSON.stringify({
         currentCategory: state.currentCategory,
         currentChapter: state.currentChapter,
+        isSidebarHidden: state.isSidebarHidden,
       })
     );
   } catch (error) {
@@ -37,7 +39,36 @@ const elements = {
   chapterList: document.querySelector('[data-chapter-list]'),
   chapterHeading: document.querySelector('[data-chapter-heading]'),
   content: document.querySelector('[data-content]'),
+  sidebarToggle: document.querySelector('[data-sidebar-toggle]'),
 };
+
+function getToggleLabel(hidden) {
+  const toggle = elements.sidebarToggle;
+  if (!toggle) {
+    return '';
+  }
+
+  const datasetKey = hidden ? 'showLabel' : 'hideLabel';
+  const fallback = hidden ? 'Sidebar anzeigen' : 'Sidebar ausblenden';
+  return toggle.dataset?.[datasetKey] || fallback;
+}
+
+function setSidebarHidden(hidden) {
+  state.isSidebarHidden = hidden;
+  document.body.classList.toggle('sidebar-hidden', hidden);
+
+  if (elements.sidebarToggle) {
+    elements.sidebarToggle.textContent = getToggleLabel(hidden);
+    elements.sidebarToggle.setAttribute('aria-expanded', String(!hidden));
+  }
+}
+
+elements.sidebarToggle?.addEventListener('click', () => {
+  setSidebarHidden(!state.isSidebarHidden);
+  saveState();
+});
+
+setSidebarHidden(state.isSidebarHidden);
 
 if (window.marked) {
   window.marked.setOptions({
@@ -305,6 +336,12 @@ async function bootstrap() {
 
     const savedState = loadSavedState() ?? {};
     const availableCategories = Object.keys(state.categories);
+
+    if (typeof savedState.isSidebarHidden === 'boolean') {
+      setSidebarHidden(savedState.isSidebarHidden);
+    } else {
+      setSidebarHidden(false);
+    }
 
     if (
       savedState.currentCategory &&
