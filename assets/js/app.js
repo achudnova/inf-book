@@ -2,6 +2,41 @@ const STORAGE_KEY = 'inf-book:state';
 
 document.documentElement.classList.add('is-loading');
 
+const pendingMathElements = new Set();
+
+function registerMathJaxReadyCallback(callback) {
+  if (typeof callback !== 'function') {
+    return;
+  }
+
+  if (window.MathJax?.typesetPromise) {
+    callback();
+    return;
+  }
+
+  const callbacks = (window.__mathJaxReadyCallbacks =
+    window.__mathJaxReadyCallbacks || []);
+  callbacks.push(callback);
+}
+
+function flushPendingMathElements() {
+  if (!pendingMathElements.size) {
+    return;
+  }
+
+  const typeset = window.MathJax?.typesetPromise;
+  if (!typeset) {
+    return;
+  }
+
+  const elements = Array.from(pendingMathElements);
+  pendingMathElements.clear();
+
+  typeset(elements).catch((error) => {
+    console.warn('Matheformeln konnten nicht gerendert werden.', error);
+  });
+}
+
 const state = {
   categories: {},
   currentCategory: null,
@@ -82,8 +117,13 @@ function setContent(html, sourcePath = '') {
 }
 
 function applyMathTypesetting(rootElement) {
+  if (!rootElement) {
+    return;
+  }
+
   const typeset = window.MathJax?.typesetPromise;
   if (!typeset) {
+    pendingMathElements.add(rootElement);
     return;
   }
 
@@ -91,6 +131,8 @@ function applyMathTypesetting(rootElement) {
     console.warn('Matheformeln konnten nicht gerendert werden.', error);
   });
 }
+
+registerMathJaxReadyCallback(flushPendingMathElements);
 
 function resolveMediaSources(rootElement, sourcePath) {
   if (!sourcePath) {

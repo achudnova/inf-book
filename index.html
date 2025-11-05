@@ -12,6 +12,8 @@
       rel="stylesheet"
     />
     <script>
+      window.__mathJaxReadyCallbacks = window.__mathJaxReadyCallbacks || [];
+
       window.MathJax = {
         tex: {
           inlineMath: [
@@ -25,6 +27,25 @@
         },
         options: {
           skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+        },
+        startup: {
+          ready() {
+            MathJax.startup.defaultReady();
+
+            const callbacks = window.__mathJaxReadyCallbacks;
+            if (!Array.isArray(callbacks)) {
+              return;
+            }
+
+            while (callbacks.length) {
+              const callback = callbacks.shift();
+              try {
+                callback?.();
+              } catch (error) {
+                console.warn('MathJax-Initialisierung konnte nicht abgeschlossen werden.', error);
+              }
+            }
+          },
         },
       };
     </script>
