@@ -1,0 +1,223 @@
+:root {
+  --bg-color: #0f0b18;
+  --surface-color: #1b122c;
+  --accent-color: #7f5af0;
+  --accent-color-muted: rgba(127, 90, 240, 0.35);
+  --text-color: #f2f2f5;
+  --muted-text-color: #aaa7bb;
+  --border-color: #2a1f3d;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg-color);
+  color: var(--text-color);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  background: rgba(12, 9, 20, 0.6);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem clamp(1rem, 5vw, 3rem);
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.brand {
+  margin: 0;
+  font-size: 1.25rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted-text-color);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.upload-button {
+  background: rgba(127, 90, 240, 0.14);
+  border: 1px solid var(--accent-color);
+  color: var(--text-color);
+  padding: 0.55rem 1.1rem;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.upload-button:hover,
+.upload-button:focus {
+  background: var(--accent-color);
+  color: #120a1f;
+  outline: none;
+}
+
+header nav {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.75rem clamp(1rem, 5vw, 3rem) 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  border-top: 1px solid rgba(42, 31, 61, 0.6);
+}
+
+.category-button {
+  background: none;
+  border: 1px solid var(--accent-color-muted);
+  color: var(--text-color);
+  padding: 0.5rem 1.25rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  letter-spacing: 0.03em;
+}
+
+.category-button:hover,
+.category-button:focus {
+  border-color: var(--accent-color);
+  background: var(--accent-color-muted);
+  outline: none;
+}
+
+.category-button.active {
+  background: var(--accent-color);
+  border-color: var(--accent-color);
+  color: #120a1f;
+  font-weight: 600;
+}
+
+main {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(250px, 22%) 1fr;
+  gap: 0;
+  overflow: hidden;
+}
+
+.sidebar {
+  background: var(--surface-color);
+  border-right: 1px solid var(--border-color);
+  padding: 1.5rem clamp(1rem, 4vw, 2.5rem);
+  overflow-y: auto;
+}
+
+.sidebar h2 {
+  margin-top: 0;
+  font-size: 1.1rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted-text-color);
+}
+
+.chapter-list {
+  list-style: none;
+  margin: 1rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.chapter-button {
+  width: 100%;
+  text-align: left;
+  background: rgba(25, 17, 39, 0.6);
+  border: 1px solid transparent;
+  color: inherit;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.chapter-button:hover,
+.chapter-button:focus {
+  border-color: var(--accent-color);
+  background: rgba(127, 90, 240, 0.12);
+  outline: none;
+}
+
+.chapter-button.active {
+  border-color: var(--accent-color);
+  background: rgba(127, 90, 240, 0.2);
+}
+
+.content {
+  padding: 2.5rem clamp(1rem, 6vw, 4rem);
+  overflow-y: auto;
+}
+
+.content article {
+  max-width: 900px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.content h1,
+.content h2,
+.content h3 {
+  color: var(--text-color);
+  font-weight: 600;
+}
+
+.content pre {
+  background: rgba(12, 8, 22, 0.85);
+  padding: 1rem;
+  border-radius: 0.75rem;
+  overflow-x: auto;
+  border: 1px solid var(--border-color);
+}
+
+.content code {
+  font-family: 'Fira Code', 'Cascadia Code', monospace;
+  color: #e4d5ff;
+}
+
+.content blockquote {
+  border-left: 3px solid var(--accent-color);
+  padding-left: 1rem;
+  color: var(--muted-text-color);
+  margin: 1.5rem 0;
+}
+
+.empty-state {
+  color: var(--muted-text-color);
+  text-align: center;
+  padding: 2rem;
+}
+
+@media (max-width: 900px) {
+  .top-bar {
+    justify-content: center;
+  }
+
+  main {
+    grid-template-columns: 100%;
+    grid-template-rows: auto auto;
+  }
+
+  .sidebar {
+    border-right: none;
+    border-bottom: 1px solid var(--border-color);
+  }
+}

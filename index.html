@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>INF Book</title>
+    <link rel="stylesheet" href="assets/css/styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <header>
+      <div class="top-bar">
+        <h1 class="brand">INF Book</h1>
+        <div class="actions">
+          <button type="button" class="upload-button" data-upload-trigger>
+            📁 Ordner hochladen
+          </button>
+          <input
+            type="file"
+            hidden
+            multiple
+            webkitdirectory
+            data-folder-input
+            aria-label="Markdown-Ordner auswählen"
+          />
+        </div>
+      </div>
+      <nav data-category-bar aria-label="Module"></nav>
+    </header>
+    <main>
+      <aside class="sidebar" aria-label="Kapitelübersicht">
+        <h2 data-chapter-heading>Kapitel</h2>
+        <ul class="chapter-list" data-chapter-list></ul>
+      </aside>
+      <section class="content">
+        <div class="empty-state" data-content>
+          Lade einen Ordner mit Markdown-Dateien hoch oder wähle eine Kategorie.
+        </div>
+      </section>
+    </main>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"
+      integrity="sha384-p3Sdz8sRP/6IDdnh3ow1XotJ/1tYL2xtVuSEh47iF9jloQ9lXIszFUKVN2P7EOKf"
+      crossorigin="anonymous"
+    ></script>
+    <script src="assets/js/app.js" defer></script>
+  </body>
+</html>

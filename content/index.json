@@ -1,0 +1,18 @@
+{
+  "Rechnerorganisation": [
+    { "title": "Einführung", "file": "content/Rechnerorganisation/einfuehrung.md" },
+    { "title": "Speicher", "file": "content/Rechnerorganisation/speicher.md" }
+  ],
+  "AnaLinA": [
+    { "title": "Grundlagen", "file": "content/AnaLinA/grundlagen.md" }
+  ],
+  "Propädeutikum": [
+    { "title": "Mathematische Werkzeuge", "file": "content/Propaedeutikum/mathematische_werkzeuge.md" }
+  ],
+  "Programmierung": [
+    { "title": "Erste Schritte", "file": "content/Programmierung/erste_schritte.md" }
+  ],
+  "Latex": [
+    { "title": "Dokumentstruktur", "file": "content/Latex/dokumentstruktur.md" }
+  ]
+}
