@@ -78,6 +78,18 @@ function setContent(html, sourcePath = '') {
   resolveMediaSources(article, sourcePath);
   applySyntaxHighlighting(article);
   elements.content.appendChild(article);
+  applyMathTypesetting(article);
+}
+
+function applyMathTypesetting(rootElement) {
+  const typeset = window.MathJax?.typesetPromise;
+  if (!typeset) {
+    return;
+  }
+
+  typeset([rootElement]).catch((error) => {
+    console.warn('Matheformeln konnten nicht gerendert werden.', error);
+  });
 }
 
 function resolveMediaSources(rootElement, sourcePath) {
