@@ -26,43 +26,107 @@ function clearActiveButtons(selector) {
   });
 }
 
-function highlightCodeBlocks(root) {
+function getRequiredLanguages(blocks) {
+  return Array.from(
+    new Set(
+      Array.from(blocks)
+        .map((block) => {
+          const languageMatch = block.className.match(/language-([\w-]+)/);
+          return languageMatch ? languageMatch[1] : null;
+        })
+        .filter(Boolean)
+    )
+  );
+}
+
+function isHighlightReady(requiredLanguages) {
+  if (!window.hljs?.highlightElement) {
+    return false;
+  }
+
+  return requiredLanguages.every((language) =>
+    Boolean(window.hljs.getLanguage(language))
+  );
+}
+
+function waitForHighlight(requiredLanguages) {
+  if (isHighlightReady(requiredLanguages)) {
+    return Promise.resolve(true);
+  }
+
+  const scripts = [
+    document.querySelector(
+      'script[src*="highlight.js"], script[src*="highlight.min.js"]'
+    ),
+    ...requiredLanguages.map((language) =>
+      document.querySelector(
+        `script[src*="/languages/${CSS.escape(language)}.js"], script[src*="/languages/${CSS.escape(
+          language
+        )}.min.js"]`
+      )
+    ),
+  ].filter(Boolean);
+
+  return new Promise((resolve) => {
+    const tryResolve = () => {
+      if (isHighlightReady(requiredLanguages)) {
+        cleanup();
+        resolve(true);
+      }
+    };
+
+    const cleanup = () => {
+      clearTimeout(timeoutId);
+      clearInterval(pollId);
+      listeners.forEach(({ script, handler }) => {
+        script.removeEventListener('load', handler);
+      });
+    };
+
+    const listeners = scripts.map((script) => {
+      const handler = () => {
+        tryResolve();
+      };
+      script.addEventListener('load', handler);
+      if (script.readyState === 'loaded' || script.readyState === 'complete') {
+        Promise.resolve().then(tryResolve);
+      }
+      return { script, handler };
+    });
+
+    const pollId = setInterval(tryResolve, 50);
+    const timeoutId = setTimeout(() => {
+      cleanup();
+      resolve(false);
+    }, 5000);
+  });
+}
+
+async function highlightCodeBlocks(root) {
   const blocks = root.querySelectorAll('pre code');
   if (!blocks.length) {
     return;
   }
 
-  if (window.hljs?.highlightElement) {
-    blocks.forEach((block) => {
-      window.hljs.highlightElement(block);
-    });
+  const requiredLanguages = getRequiredLanguages(blocks);
+  const highlightReady = await waitForHighlight(requiredLanguages);
+
+  if (!highlightReady || !window.hljs?.highlightElement) {
     return;
   }
 
-  const highlightScript = document.querySelector(
-    'script[src*="highlight.js"], script[src*="highlight.min.js"]'
-  );
-
-  if (highlightScript) {
-    highlightScript.addEventListener(
-      'load',
-      () => {
-        blocks.forEach((block) => {
-          window.hljs.highlightElement(block);
-        });
-      },
-      { once: true }
-    );
-  }
+  blocks.forEach((block) => {
+    window.hljs.highlightElement(block);
+  });
 }
 
-function setContent(html) {
+async function setContent(html) {
   elements.content.innerHTML = '';
   const article = document.createElement('article');
   article.innerHTML = html;
   elements.content.appendChild(article);
 
-  highlightCodeBlocks(article);
+  await highlightCodeBlocks(article);
 }
 
 function showEmptyState(message) {
@@ -150,7 +214,7 @@ async function selectChapter(title, file, button) {
 
   const html = await loadMarkdown(file);
   if (html) {
-    setContent(html);
+    await setContent(html);
   }
 }
 
