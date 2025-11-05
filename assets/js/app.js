@@ -71,12 +71,89 @@ function clearActiveButtons(selector) {
   });
 }
 
-function setContent(html) {
+function setContent(html, sourcePath = '') {
   elements.content.innerHTML = '';
   const article = document.createElement('article');
   article.innerHTML = html;
+  resolveMediaSources(article, sourcePath);
   applySyntaxHighlighting(article);
   elements.content.appendChild(article);
+}
+
+function resolveMediaSources(rootElement, sourcePath) {
+  if (!sourcePath) {
+    return;
+  }
+
+  const basePath = sourcePath.replace(/[^/]*$/, '');
+
+  if (!basePath) {
+    return;
+  }
+
+  rootElement.querySelectorAll('img').forEach((image) => {
+    const src = image.getAttribute('src');
+    if (src) {
+      const resolved = resolveRelativePath(src, basePath);
+      if (resolved) {
+        image.src = resolved;
+      }
+    }
+
+    const srcset = image.getAttribute('srcset');
+    if (srcset) {
+      const resolvedSet = resolveSrcset(srcset, basePath);
+      if (resolvedSet) {
+        image.setAttribute('srcset', resolvedSet);
+      }
+    }
+
+    if (!image.hasAttribute('loading')) {
+      image.loading = 'lazy';
+    }
+  });
+}
+
+function resolveRelativePath(path, basePath) {
+  if (!path || isExternalPath(path) || path.startsWith('/')) {
+    return path;
+  }
+
+  try {
+    const baseUrl = new URL(basePath, `${window.location.origin}/`);
+    const resolvedUrl = new URL(path, baseUrl);
+    return `${resolvedUrl.pathname}${resolvedUrl.search}${resolvedUrl.hash}`;
+  } catch (error) {
+    console.warn('Bildpfad konnte nicht aufgelöst werden:', path, error);
+    return path;
+  }
+}
+
+function resolveSrcset(srcset, basePath) {
+  const entries = srcset
+    .split(',')
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+
+  if (!entries.length) {
+    return srcset;
+  }
+
+  return entries
+    .map((entry) => {
+      const [url, descriptor] = entry.split(/\s+/, 2);
+      if (!url) {
+        return entry;
+      }
+
+      const resolved = resolveRelativePath(url, basePath);
+      return descriptor ? `${resolved} ${descriptor}` : resolved;
+    })
+    .join(', ');
+}
+
+function isExternalPath(value) {
+  return /^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(value) || value.startsWith('//');
 }
 
 function applySyntaxHighlighting(rootElement) {
@@ -212,7 +289,7 @@ async function selectChapter(title, file, button) {
 
   const html = await loadMarkdown(file);
   if (html) {
-    setContent(html);
+    setContent(html, file);
   }
 
   saveState();
