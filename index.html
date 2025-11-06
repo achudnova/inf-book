@@ -13,7 +13,7 @@
     />
   </head>
   <body>
-    <header>
+    <header id="topbar">
       <div class="header-inner">
         <button
           type="button"
@@ -24,11 +24,40 @@
           aria-controls="sidebar"
           aria-expanded="true"
         >
-          Sidebar ausblenden
+          <span class="icon-bars" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+          </span>
+          <span class="visually-hidden" data-sidebar-label>
+            Sidebar ausblenden
+          </span>
         </button>
         <nav data-category-bar aria-label="Module"></nav>
+        <button
+          type="button"
+          class="category-button topbar-toggle"
+          data-topbar-toggle
+          data-show-label="Top-Bar anzeigen"
+          data-hide-label="Top-Bar ausblenden"
+          aria-controls="topbar"
+          aria-expanded="true"
+        >
+          <span data-topbar-label>Top-Bar ausblenden</span>
+        </button>
       </div>
     </header>
+    <button
+      type="button"
+      class="category-button topbar-floating-toggle"
+      data-topbar-toggle
+      data-show-label="Top-Bar anzeigen"
+      data-hide-label="Top-Bar ausblenden"
+      aria-controls="topbar"
+      aria-expanded="true"
+    >
+      <span data-topbar-label>Top-Bar anzeigen</span>
+    </button>
     <main>
       <aside id="sidebar" class="sidebar" aria-label="Kapitelübersicht">
         <h2 data-chapter-heading>Kapitel</h2>
