@@ -107,6 +107,7 @@ function setContent(html, sourcePath = '') {
   const article = document.createElement('article');
   article.innerHTML = html;
   resolveMediaSources(article, sourcePath);
+  restoreLatexLineBreaks(article);
   applySyntaxHighlighting(article);
   applyMathTypesetting(article);
   elements.content.appendChild(article);
@@ -216,6 +217,31 @@ function applyMathTypesetting(rootElement) {
   } catch (error) {
     console.warn('Mathematische Formeln konnten nicht gerendert werden.', error);
   }
+}
+
+function restoreLatexLineBreaks(rootElement) {
+  const potentialContainers = rootElement.querySelectorAll(
+    'p, div, span, li, td, th'
+  );
+
+  potentialContainers.forEach((element) => {
+    if (!element.querySelector('br')) {
+      return;
+    }
+
+    const rawContent = element.innerHTML.trim();
+    const usesDisplayMath =
+      (rawContent.startsWith('$$') && rawContent.endsWith('$$')) ||
+      (rawContent.startsWith('\\[') && rawContent.endsWith('\\]'));
+
+    if (!usesDisplayMath) {
+      return;
+    }
+
+    element.querySelectorAll('br').forEach((lineBreak) => {
+      lineBreak.replaceWith(document.createTextNode('\\'));
+    });
+  });
 }
 
 function showEmptyState(message) {
