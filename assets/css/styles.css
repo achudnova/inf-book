@@ -81,6 +81,46 @@ header nav {
 
 .topbar-toggle {
   flex-shrink: 0;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+}
+
+.topbar-toggle .icon-chevron-up {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.topbar-toggle .icon-chevron-up::before,
+.topbar-toggle .icon-chevron-up::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 70%;
+  height: 2px;
+  background: currentColor;
+  border-radius: 999px;
+  transition: transform 0.3s ease;
+}
+
+.topbar-toggle .icon-chevron-up::before {
+  transform: translateY(-35%) rotate(45deg);
+}
+
+.topbar-toggle .icon-chevron-up::after {
+  transform: translateY(-35%) rotate(-45deg);
+}
+
+.topbar-hidden .topbar-toggle .icon-chevron-up::before {
+  transform: translateY(-5%) rotate(-45deg);
+}
+
+.topbar-hidden .topbar-toggle .icon-chevron-up::after {
+  transform: translateY(-5%) rotate(45deg);
 }
 
 .topbar-floating-toggle {
