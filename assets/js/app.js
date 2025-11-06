@@ -107,7 +107,9 @@ function setContent(html, sourcePath = '') {
   const article = document.createElement('article');
   article.innerHTML = html;
   resolveMediaSources(article, sourcePath);
+  restoreLatexLineBreaks(article);
   applySyntaxHighlighting(article);
+  applyMathTypesetting(article);
   elements.content.appendChild(article);
 }
 
@@ -194,6 +196,52 @@ function applySyntaxHighlighting(rootElement) {
 
   rootElement.querySelectorAll('pre code').forEach((block) => {
     window.hljs.highlightElement(block);
+  });
+}
+
+function applyMathTypesetting(rootElement) {
+  if (!window.renderMathInElement) {
+    return;
+  }
+
+  try {
+    window.renderMathInElement(rootElement, {
+      delimiters: [
+        { left: '$$', right: '$$', display: true },
+        { left: '\\[', right: '\\]', display: true },
+        { left: '\\(', right: '\\)', display: false },
+        { left: '$', right: '$', display: false },
+      ],
+      throwOnError: false,
+    });
+  } catch (error) {
+    console.warn('Mathematische Formeln konnten nicht gerendert werden.', error);
+  }
+}
+
+function restoreLatexLineBreaks(rootElement) {
+  const potentialContainers = rootElement.querySelectorAll(
+    'p, div, span, li, td, th'
+  );
+
+  potentialContainers.forEach((element) => {
+    const originalHtml = element.innerHTML;
+
+    if (!originalHtml || !originalHtml.includes('<br')) {
+      return;
+    }
+
+    const updatedHtml = originalHtml.replace(
+      /(\$\$[\s\S]*?\$\$|\\\[[\s\S]*?\\\])/g,
+      (match) =>
+        match.replace(/<br\s*\/?>(?:\n)?/gi, () => {
+          return '\\' + '\n';
+        })
+    );
+
+    if (updatedHtml !== originalHtml) {
+      element.innerHTML = updatedHtml;
+    }
   });
 }
 
