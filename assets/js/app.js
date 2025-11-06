@@ -225,22 +225,23 @@ function restoreLatexLineBreaks(rootElement) {
   );
 
   potentialContainers.forEach((element) => {
-    if (!element.querySelector('br')) {
+    const originalHtml = element.innerHTML;
+
+    if (!originalHtml || !originalHtml.includes('<br')) {
       return;
     }
 
-    const rawContent = element.innerHTML.trim();
-    const usesDisplayMath =
-      (rawContent.startsWith('$$') && rawContent.endsWith('$$')) ||
-      (rawContent.startsWith('\\[') && rawContent.endsWith('\\]'));
+    const updatedHtml = originalHtml.replace(
+      /(\$\$[\s\S]*?\$\$|\\\[[\s\S]*?\\\])/g,
+      (match) =>
+        match.replace(/<br\s*\/?>(?:\n)?/gi, () => {
+          return '\\' + '\n';
+        })
+    );
 
-    if (!usesDisplayMath) {
-      return;
+    if (updatedHtml !== originalHtml) {
+      element.innerHTML = updatedHtml;
     }
-
-    element.querySelectorAll('br').forEach((lineBreak) => {
-      lineBreak.replaceWith(document.createTextNode('\\'));
-    });
   });
 }
 
