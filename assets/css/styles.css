@@ -79,14 +79,15 @@ header nav {
   border: 0;
 }
 
-.topbar-toggle {
+.topbar-toggle,
+.topbar-floating-toggle {
   flex-shrink: 0;
   width: 2.75rem;
   height: 2.75rem;
   padding: 0;
 }
 
-.topbar-toggle .icon-chevron-up {
+.icon-chevron {
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -95,8 +96,8 @@ header nav {
   height: 1.25rem;
 }
 
-.topbar-toggle .icon-chevron-up::before,
-.topbar-toggle .icon-chevron-up::after {
+.icon-chevron::before,
+.icon-chevron::after {
   content: '';
   position: absolute;
   top: 50%;
@@ -107,11 +108,11 @@ header nav {
   transition: transform 0.3s ease;
 }
 
-.topbar-toggle .icon-chevron-up::before {
+.icon-chevron-up::before {
   transform: translateY(-35%) rotate(45deg);
 }
 
-.topbar-toggle .icon-chevron-up::after {
+.icon-chevron-up::after {
   transform: translateY(-35%) rotate(-45deg);
 }
 
@@ -120,6 +121,14 @@ header nav {
 }
 
 .topbar-hidden .topbar-toggle .icon-chevron-up::after {
+  transform: translateY(-5%) rotate(45deg);
+}
+
+.icon-chevron-down::before {
+  transform: translateY(-5%) rotate(-45deg);
+}
+
+.icon-chevron-down::after {
   transform: translateY(-5%) rotate(45deg);
 }
 
