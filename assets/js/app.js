@@ -7,6 +7,7 @@ const state = {
   currentCategory: null,
   currentChapter: null,
   isSidebarHidden: false,
+  isTopbarHidden: false,
 };
 
 function loadSavedState() {
@@ -27,6 +28,7 @@ function saveState() {
         currentCategory: state.currentCategory,
         currentChapter: state.currentChapter,
         isSidebarHidden: state.isSidebarHidden,
+        isTopbarHidden: state.isTopbarHidden,
       })
     );
   } catch (error) {
@@ -40,9 +42,10 @@ const elements = {
   chapterHeading: document.querySelector('[data-chapter-heading]'),
   content: document.querySelector('[data-content]'),
   sidebarToggle: document.querySelector('[data-sidebar-toggle]'),
+  topbarToggles: Array.from(document.querySelectorAll('[data-topbar-toggle]')),
 };
 
-function getToggleLabel(hidden) {
+function getSidebarToggleLabel(hidden) {
   const toggle = elements.sidebarToggle;
   if (!toggle) {
     return '';
@@ -58,7 +61,14 @@ function setSidebarHidden(hidden) {
   document.body.classList.toggle('sidebar-hidden', hidden);
 
   if (elements.sidebarToggle) {
-    elements.sidebarToggle.textContent = getToggleLabel(hidden);
+    const label = getSidebarToggleLabel(hidden);
+    const labelElement = elements.sidebarToggle.querySelector(
+      '[data-sidebar-label]'
+    );
+    if (labelElement) {
+      labelElement.textContent = label;
+    }
+    elements.sidebarToggle.setAttribute('aria-label', label);
     elements.sidebarToggle.setAttribute('aria-expanded', String(!hidden));
   }
 }
@@ -68,7 +78,43 @@ elements.sidebarToggle?.addEventListener('click', () => {
   saveState();
 });
 
+function getTopbarLabel(toggle, hidden) {
+  if (!toggle) {
+    return hidden ? 'Top-Bar anzeigen' : 'Top-Bar ausblenden';
+  }
+
+  const datasetKey = hidden ? 'showLabel' : 'hideLabel';
+  const fallback = hidden ? 'Top-Bar anzeigen' : 'Top-Bar ausblenden';
+  return toggle.dataset?.[datasetKey] || fallback;
+}
+
+function setTopbarHidden(hidden) {
+  state.isTopbarHidden = hidden;
+  document.body.classList.toggle('topbar-hidden', hidden);
+
+  elements.topbarToggles.forEach((toggle) => {
+    const label = getTopbarLabel(toggle, hidden);
+    const labelElement = toggle.querySelector('[data-topbar-label]');
+    if (labelElement) {
+      labelElement.textContent = label;
+    } else {
+      toggle.textContent = label;
+    }
+
+    toggle.setAttribute('aria-label', label);
+    toggle.setAttribute('aria-expanded', String(!hidden));
+  });
+}
+
+elements.topbarToggles.forEach((toggle) => {
+  toggle.addEventListener('click', () => {
+    setTopbarHidden(!state.isTopbarHidden);
+    saveState();
+  });
+});
+
 setSidebarHidden(state.isSidebarHidden);
+setTopbarHidden(state.isTopbarHidden);
 
 if (window.marked) {
   window.marked.setOptions({
@@ -389,6 +435,12 @@ async function bootstrap() {
       setSidebarHidden(savedState.isSidebarHidden);
     } else {
       setSidebarHidden(false);
+    }
+
+    if (typeof savedState.isTopbarHidden === 'boolean') {
+      setTopbarHidden(savedState.isTopbarHidden);
+    } else {
+      setTopbarHidden(false);
     }
 
     if (
