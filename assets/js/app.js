@@ -70,7 +70,7 @@ function updateThemeToggle(theme) {
 
   const isDark = theme === 'dark';
   const labelKey = isDark ? 'darkLabel' : 'lightLabel';
-  const fallbackLabel = isDark ? '🌙 Dunkel' : '✨ Hell';
+  const fallbackLabel = isDark ? '🌙' : '☀️';
   button.textContent = button.dataset?.[labelKey] || fallbackLabel;
 
   const switchLabelKey = isDark ? 'switchToLightLabel' : 'switchToDarkLabel';
