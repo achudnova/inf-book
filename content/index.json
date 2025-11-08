@@ -33,16 +33,12 @@
       "file": "content/Rechnerorganisation/einfuehrung.md"
     },
     {
-      "title": "Fliesskommazahlen",
-      "file": "content/Rechnerorganisation/fliesskommazahlen.md"
-    },
-    {
       "title": "Speicher",
       "file": "content/Rechnerorganisation/speicher.md"
     },
     {
-      "title": "Test file",
-      "file": "content/Rechnerorganisation/test.md"
+      "title": "Zahlen",
+      "file": "content/Rechnerorganisation/zahlen.md"
     }
   ]
 }
