@@ -1,11 +1,4 @@
 :root {
-  --bg-color: #0f0b18;
-  --surface-color: #1b122c;
-  --accent-color: #7f5af0;
-  --accent-color-muted: rgba(127, 90, 240, 0.35);
-  --text-color: #f2f2f5;
-  --muted-text-color: #aaa7bb;
-  --border-color: #2a1f3d;
   font-family: 'Inter', 'Segoe UI', sans-serif;
 }
 
@@ -20,10 +13,63 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  color-scheme: var(--color-scheme, dark);
+}
+
+body.theme-dark {
+  --color-scheme: dark;
+  --bg-color: #0f0b18;
+  --surface-color: #1b122c;
+  --accent-color: #7f5af0;
+  --accent-color-muted: rgba(127, 90, 240, 0.35);
+  --text-color: #f2f2f5;
+  --muted-text-color: #aaa7bb;
+  --border-color: #2a1f3d;
+  --topbar-bg: rgba(12, 9, 20, 0.6);
+  --floating-toggle-bg: rgba(27, 18, 44, 0.95);
+  --floating-toggle-shadow: 0 18px 40px rgba(12, 9, 20, 0.45);
+  --chapter-button-bg: rgba(25, 17, 39, 0.6);
+  --chapter-button-hover-bg: rgba(127, 90, 240, 0.12);
+  --chapter-button-active-bg: rgba(127, 90, 240, 0.2);
+  --button-active-text-color: #120a1f;
+  --image-border-color: rgba(255, 255, 255, 0.05);
+  --image-shadow: 0 12px 30px rgba(12, 8, 22, 0.35);
+  --code-block-bg: rgba(12, 8, 22, 0.85);
+  --code-text-color: #e4d5ff;
+  --hljs-text-color: #f2f2f5;
+  --hljs-keyword-color: #7f5af0;
+  --hljs-string-color: #2cb67d;
+  --hljs-comment-color: #6b6780;
+}
+
+body.theme-light {
+  --color-scheme: light;
+  --bg-color: #f5f3ff;
+  --surface-color: #ffffff;
+  --accent-color: #7f5af0;
+  --accent-color-muted: rgba(127, 90, 240, 0.15);
+  --text-color: #241445;
+  --muted-text-color: #5a4b82;
+  --border-color: #d8cff5;
+  --topbar-bg: rgba(255, 255, 255, 0.85);
+  --floating-toggle-bg: rgba(255, 255, 255, 0.95);
+  --floating-toggle-shadow: 0 18px 35px rgba(124, 104, 173, 0.25);
+  --chapter-button-bg: rgba(255, 255, 255, 0.8);
+  --chapter-button-hover-bg: rgba(127, 90, 240, 0.15);
+  --chapter-button-active-bg: rgba(127, 90, 240, 0.25);
+  --button-active-text-color: #ffffff;
+  --image-border-color: rgba(36, 20, 69, 0.08);
+  --image-shadow: 0 18px 35px rgba(124, 104, 173, 0.2);
+  --code-block-bg: rgba(244, 240, 255, 0.85);
+  --code-text-color: #3b2a64;
+  --hljs-text-color: #3b2a64;
+  --hljs-keyword-color: #5a36b3;
+  --hljs-string-color: #1c8454;
+  --hljs-comment-color: #8c82a8;
 }
 
 header {
-  background: rgba(12, 9, 20, 0.6);
+  background: var(--topbar-bg);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border-color);
   position: sticky;
@@ -139,9 +185,9 @@ header nav {
   pointer-events: none;
   visibility: hidden;
   transition: opacity 0.3s ease;
-  background: rgba(27, 18, 44, 0.95);
+  background: var(--floating-toggle-bg);
   border-color: var(--accent-color);
-  box-shadow: 0 18px 40px rgba(12, 9, 20, 0.45);
+  box-shadow: var(--floating-toggle-shadow);
 }
 
 .topbar-hidden header {
@@ -179,7 +225,7 @@ header nav {
 .category-button.active {
   background: var(--accent-color);
   border-color: var(--accent-color);
-  color: #120a1f;
+  color: var(--button-active-text-color);
   font-weight: 600;
 }
 
@@ -241,7 +287,7 @@ main {
 .chapter-button {
   width: 100%;
   text-align: left;
-  background: rgba(25, 17, 39, 0.6);
+  background: var(--chapter-button-bg);
   border: 1px solid transparent;
   color: inherit;
   padding: 0.75rem 1rem;
@@ -253,13 +299,13 @@ main {
 .chapter-button:hover,
 .chapter-button:focus {
   border-color: var(--accent-color);
-  background: rgba(127, 90, 240, 0.12);
+  background: var(--chapter-button-hover-bg);
   outline: none;
 }
 
 .chapter-button.active {
   border-color: var(--accent-color);
-  background: rgba(127, 90, 240, 0.2);
+  background: var(--chapter-button-active-bg);
 }
 
 .content {
@@ -279,8 +325,8 @@ main {
   display: block;
   margin: 1.5rem auto;
   border-radius: 0.5rem;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  box-shadow: 0 12px 30px rgba(12, 8, 22, 0.35);
+  border: 1px solid var(--image-border-color);
+  box-shadow: var(--image-shadow);
 }
 
 .content figure {
@@ -302,7 +348,7 @@ main {
 }
 
 .content pre {
-  background: rgba(12, 8, 22, 0.85);
+  background: var(--code-block-bg);
   padding: 1rem;
   border-radius: 0.75rem;
   overflow-x: auto;
@@ -311,11 +357,11 @@ main {
 
 .content code {
   font-family: 'Fira Code', 'Cascadia Code', monospace;
-  color: #e4d5ff;
+  color: var(--code-text-color);
 }
 
 .hljs {
-  color: #f2f2f5;
+  color: var(--hljs-text-color);
   background: transparent;
 }
 
@@ -323,7 +369,7 @@ main {
 .hljs-selector-tag,
 .hljs-literal,
 .hljs-section {
-  color: #7f5af0;
+  color: var(--hljs-keyword-color);
   font-weight: 600;
 }
 
@@ -333,12 +379,12 @@ main {
 .hljs-type,
 .hljs-attribute,
 .hljs-number {
-  color: #2cb67d;
+  color: var(--hljs-string-color);
 }
 
 .hljs-comment,
 .hljs-quote {
-  color: #6b6780;
+  color: var(--hljs-comment-color);
   font-style: italic;
 }
 

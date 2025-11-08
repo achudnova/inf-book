@@ -8,6 +8,7 @@ const state = {
   currentChapter: null,
   isSidebarHidden: false,
   isTopbarHidden: false,
+  theme: 'dark',
 };
 
 function loadSavedState() {
@@ -29,11 +30,26 @@ function saveState() {
         currentChapter: state.currentChapter,
         isSidebarHidden: state.isSidebarHidden,
         isTopbarHidden: state.isTopbarHidden,
+        theme: state.theme,
       })
     );
   } catch (error) {
     console.warn('Status konnte nicht gespeichert werden.', error);
   }
+}
+
+const persistedState = loadSavedState() ?? {};
+
+if (persistedState.theme === 'light' || persistedState.theme === 'dark') {
+  state.theme = persistedState.theme;
+}
+
+if (typeof persistedState.isSidebarHidden === 'boolean') {
+  state.isSidebarHidden = persistedState.isSidebarHidden;
+}
+
+if (typeof persistedState.isTopbarHidden === 'boolean') {
+  state.isTopbarHidden = persistedState.isTopbarHidden;
 }
 
 const elements = {
@@ -43,7 +59,42 @@ const elements = {
   content: document.querySelector('[data-content]'),
   sidebarToggle: document.querySelector('[data-sidebar-toggle]'),
   topbarToggles: Array.from(document.querySelectorAll('[data-topbar-toggle]')),
+  themeToggle: document.querySelector('[data-theme-toggle]'),
 };
+
+function updateThemeToggle(theme) {
+  const button = elements.themeToggle;
+  if (!button) {
+    return;
+  }
+
+  const isDark = theme === 'dark';
+  const labelKey = isDark ? 'darkLabel' : 'lightLabel';
+  const fallbackLabel = isDark ? '🌙 Dunkel' : '✨ Hell';
+  button.textContent = button.dataset?.[labelKey] || fallbackLabel;
+
+  const switchLabelKey = isDark ? 'switchToLightLabel' : 'switchToDarkLabel';
+  const fallbackSwitchLabel = isDark
+    ? 'Zu hellem Thema wechseln'
+    : 'Zu dunklem Thema wechseln';
+
+  button.setAttribute(
+    'aria-label',
+    button.dataset?.[switchLabelKey] || fallbackSwitchLabel
+  );
+  button.setAttribute('aria-pressed', String(isDark));
+}
+
+function setTheme(theme) {
+  const normalized = theme === 'light' ? 'light' : 'dark';
+  state.theme = normalized;
+
+  document.body.classList.remove('theme-dark', 'theme-light');
+  document.body.classList.add(`theme-${normalized}`);
+  document.body.setAttribute('data-theme', normalized);
+
+  updateThemeToggle(normalized);
+}
 
 function getSidebarToggleLabel(hidden) {
   const toggle = elements.sidebarToggle;
@@ -113,6 +164,13 @@ elements.topbarToggles.forEach((toggle) => {
   });
 });
 
+elements.themeToggle?.addEventListener('click', () => {
+  const nextTheme = state.theme === 'dark' ? 'light' : 'dark';
+  setTheme(nextTheme);
+  saveState();
+});
+
+setTheme(state.theme);
 setSidebarHidden(state.isSidebarHidden);
 setTopbarHidden(state.isTopbarHidden);
 
@@ -428,20 +486,8 @@ async function bootstrap() {
     }
     state.categories = await response.json();
 
-    const savedState = loadSavedState() ?? {};
+    const savedState = persistedState;
     const availableCategories = Object.keys(state.categories);
-
-    if (typeof savedState.isSidebarHidden === 'boolean') {
-      setSidebarHidden(savedState.isSidebarHidden);
-    } else {
-      setSidebarHidden(false);
-    }
-
-    if (typeof savedState.isTopbarHidden === 'boolean') {
-      setTopbarHidden(savedState.isTopbarHidden);
-    } else {
-      setTopbarHidden(false);
-    }
 
     if (
       savedState.currentCategory &&
