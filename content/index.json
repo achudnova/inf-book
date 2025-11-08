@@ -1,18 +1,40 @@
 {
-  "Rechnerorganisation": [
-    { "title": "Einführung", "file": "content/Rechnerorganisation/einfuehrung.md" },
-    { "title": "Speicher", "file": "content/Rechnerorganisation/speicher.md" }
-  ],
   "AnaLinA": [
-    { "title": "Grundlagen", "file": "content/AnaLinA/grundlagen.md" }
-  ],
-  "Propädeutikum": [
-    { "title": "Mathematische Werkzeuge", "file": "content/Propaedeutikum/mathematische_werkzeuge.md" }
-  ],
-  "Programmierung": [
-    { "title": "Erste Schritte", "file": "content/Programmierung/erste_schritte.md" }
+    {
+      "title": "Grundlagen",
+      "file": "content/AnaLinA/grundlagen.md"
+    }
   ],
   "Latex": [
-    { "title": "Dokumentstruktur", "file": "content/Latex/dokumentstruktur.md" }
+    {
+      "title": "Dokumentstruktur",
+      "file": "content/Latex/dokumentstruktur.md"
+    }
+  ],
+  "Programmierung": [
+    {
+      "title": "Erste Schritte",
+      "file": "content/Programmierung/erste_schritte.md"
+    }
+  ],
+  "Propädeutikum": [
+    {
+      "title": "Computer",
+      "file": "content/Propaedeutikum/computer.md"
+    },
+    {
+      "title": "Mathematische Werkzeuge",
+      "file": "content/Propaedeutikum/mathematische_werkzeuge.md"
+    }
+  ],
+  "Rechnerorganisation": [
+    {
+      "title": "Einführung",
+      "file": "content/Rechnerorganisation/einfuehrung.md"
+    },
+    {
+      "title": "Speicher",
+      "file": "content/Rechnerorganisation/speicher.md"
+    }
   ]
 }
