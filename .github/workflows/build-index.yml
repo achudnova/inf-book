@@ -28,3 +28,6 @@ jobs:
         with:
           commit_message: 'chore: update content index'
           file_pattern: content/index.json
+
+permissions:
+  contents: write
