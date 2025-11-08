@@ -1,4 +1,4 @@
-# Fliesskommazahlen
+# Zahlen
 
 Zahlendarstellung und -umwandlung
 
