@@ -56,6 +56,11 @@ async function deriveTitle(filePath) {
     .join(' ');
 }
 
+const collator = new Intl.Collator(undefined, {
+  numeric: true,
+  sensitivity: 'base',
+});
+
 async function collectSectionData(folderName, existingTitles) {
   const dirPath = path.join(CONTENT_DIR, folderName);
   const dirEntries = await fs.readdir(dirPath, { withFileTypes: true });
@@ -63,7 +68,7 @@ async function collectSectionData(folderName, existingTitles) {
   const markdownFiles = dirEntries
     .filter((entry) => entry.isFile() && entry.name.toLowerCase().endsWith('.md'))
     .map((entry) => entry.name)
-    .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
+    .sort((a, b) => collator.compare(a, b));
 
   if (markdownFiles.length === 0) {
     return null;
@@ -98,7 +103,7 @@ async function buildIndex() {
     }
   }
 
-  sections.sort((a, b) => a[0].localeCompare(b[0], undefined, { sensitivity: 'base' }));
+  sections.sort((a, b) => collator.compare(a[0], b[0]));
 
   const indexData = {};
   for (const [sectionTitle, entries] of sections) {
