@@ -13,6 +13,10 @@
   ],
   "Programmierung": [
     {
+      "title": "Sortieralgorithmen",
+      "file": "content/Programmierung/algorithmen.md"
+    },
+    {
       "title": "Erste Schritte",
       "file": "content/Programmierung/erste_schritte.md"
     }
